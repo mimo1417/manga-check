@@ -3,7 +3,7 @@
 # @Author: vietvu
 # @Date:   2016-10-11 17:56:14
 # @Last Modified by:   Viet Vu
-# @Last Modified time: 2016-10-12 00:03:24
+# @Last Modified time: 2016-10-12 11:01:21
 import os
 from tempfile import gettempdir
 
@@ -27,7 +27,7 @@ def _soup_truyentranhtuan(soup):
     Returns:
         int: latest chapter
     """
-    return int(soup.select('div#manga-chapter a')[0].text.split('-')[-1])
+    return int(soup.select('div#manga-chapter a')[0].text.split(' ')[-1])
 
 
 # list of manga

@@ -62,18 +62,30 @@ Of course you can add your own site and manga, just inspect the element and craw
 # Usage
 Run the main script. I have implemented sample usage file in main.py
 
+Invoke without command to run
+
         python main.py
 
+or run command, and optional options. Check at help:
+
+        ./main.py --help
         Usage: main.py [OPTIONS] COMMAND [ARGS]...
 
         Options:
-          --help  Show this message and exit.
+          --web / --no-web  Open web browser on updated chapter
+          --help            Show this message and exit.
 
         Commands:
           check  Check for latest manga chapter!
           clean  Remove local data file
+          show   Show local data
 
-run without command, or with command `check` to start. The result are list of site has new chapter.
+When running without command, or with command `check` to start. The result are list of site has new chapter.
+
+        New chapter: One Piece-842
+        New chapter: Gintama-607
+        New chapter: Fairy Tail-505
+        New chapter: The Ruler Of The Land (Vietnamese)-509
 
 You can either simple print them out, or like me: I let a cronjob run every week at Thursday evening and Sunday evening, if there are any new update, open web browser of the site. Easy!
 

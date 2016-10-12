@@ -2,7 +2,7 @@
 # @Author: vietvu
 # @Date:   2016-10-11 18:55:14
 # @Last Modified by:   Viet Vu
-# @Last Modified time: 2016-10-11 23:52:04
+# @Last Modified time: 2016-10-12 10:24:24
 import unittest
 from manga_check.crawler import MangaCrawler
 
@@ -13,5 +13,5 @@ class TestCrawl(unittest.TestCase):
         self.assertIsInstance(self.crawler.check(), list)
 
     def testCrawl(self):
-        self.assertIsInstance(self.crawler.crawl('1'), int)
+        self.assertIsInstance(self.crawler.crawl(1), int)
 
