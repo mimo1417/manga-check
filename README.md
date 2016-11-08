@@ -68,7 +68,6 @@ Invoke without command to run
 
 or run command, and optional options. Check at help:
 
-        ./main.py --help
         Usage: main.py [OPTIONS] COMMAND [ARGS]...
 
         Options:
@@ -79,13 +78,15 @@ or run command, and optional options. Check at help:
           check  Check for latest manga chapter!
           clean  Remove local data file
           show   Show local data
+          web    Open web with ID provided
 
 When running without command, or with command `check` to start. The result are list of site has new chapter.
 
-        New chapter: One Piece-842
-        New chapter: Gintama-607
-        New chapter: Fairy Tail-505
-        New chapter: The Ruler Of The Land (Vietnamese)-509
+        [0] New chapter: One Piece-845
+        [1] New chapter: Gintama-611
+        [2] New chapter: Fairy Tail-509
+        [3] New chapter: The Ruler Of The Land (Vietnamese)-511
+        [4] New chapter: One Punch man-108
 
 You can either simple print them out, or like me: I let a cronjob run every week at Thursday evening and Sunday evening, if there are any new update, open web browser of the site. Easy!
 
