@@ -27,16 +27,16 @@ class MangaCrawler(object):
         Returns:
             list: list of manga that have been updated
         """
-        for manga in MANGAS:
-            latest = self.crawl(manga['id'])
-            if manga['id'] in self.data:
-                cur_latest = self.data[manga['id']]
+        for id, manga in MANGAS.iteritems():
+            latest = self.crawl(id)
+            if id in self.data:
+                cur_latest = self.data[id]
             else:
                 cur_latest = 0
-                self.data[manga['id']] = 0
+                self.data[id] = 0
             if latest > cur_latest:
-                self.updated_data.append((manga['id'], latest))
-                self.data[manga['id']] = latest
+                self.updated_data.append((id, latest))
+                self.data[id] = latest
 
         self.write_to_file()
 

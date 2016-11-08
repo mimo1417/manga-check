@@ -31,10 +31,13 @@ def check(ctx):
     updated_chapter = crawler.check()
     if updated_chapter:
         for manga in updated_chapter:
-            click.echo("New chapter: {}-{}".format(manga['name'], manga['latest']))
-            if ctx.obj['web']: webbrowser.open(manga['url'])
+            click.echo("[{}] New chapter: {}-{}".format(manga['id'],
+                                                        manga['name'], manga['latest']))
+            if ctx.obj['web']:
+                webbrowser.open(manga['url'])
     else:
         click.echo("There are no new chapter")
+
 
 @commands.command()
 def clean():
@@ -45,16 +48,36 @@ def clean():
     except OSError as e:
         click.echo("Cannot delete file {}".format(DATA_FILE))
 
+
 @commands.command()
 def show():
     """Show local data"""
-    try:
-        reader = csv.reader(open(DATA_FILE, 'rb'))
-        click.echo("File {}:".format(DATA_FILE))
+    with open(DATA_FILE) as csvfile:
+        reader = csv.reader(csvfile)
+        click.echo("Showing file {}:".format(DATA_FILE))
         for row in reader:
-            click.echo("{}: {}".format(MANGAS[int(row[0])]['name'], row[1]))
-    except IOError:
-        click.echo("File {} not exist".format(DATA_FILE))
+            id = int(row[0])
+            click.echo("[{}] {}: {}".format(
+                MANGAS[id]['id'], MANGAS[id]['name'], row[1]))
+
+@commands.command()
+@click.argument('id')
+def web(id):
+    """Open web with ID provided"""
+    try:
+        id = int(id)
+        if not id in MANGAS:
+            raise ValueError
+        manga = MANGAS[id]
+        with open(DATA_FILE) as csvfile:
+            file_data = csv.reader(csvfile)
+            latest_data = dict((int(row[0]), int(row[1])) for row in file_data)
+        click.echo("Opening {} at {}".format(manga['name'],manga['url']))
+        webbrowser.open("{}/{}".format(manga['url'], latest_data[id]))
+    except ValueError as e:
+        click.echo("ID not invalid: {}, need to be a number in config. see show command".format(id))
+    except:
+        click.echo("Something wrong")
 
 if __name__ == '__main__':
     commands(obj={})
