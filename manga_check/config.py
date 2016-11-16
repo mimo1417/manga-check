@@ -27,7 +27,7 @@ def _soup_truyentranhtuan(soup):
     Returns:
         int: latest chapter
     """
-    return int(soup.select('div#manga-chapter a')[0].text.split(' ')[-1])
+    return int([s for s in soup.select('div#manga-chapter a')[0].text.split(' ') if s.isdigit()][-1])
 
 
 # list of manga
@@ -66,4 +66,5 @@ MANGAS = {
 
 # data storage
 DATA_FILE_NAME = 'manga_check.csv'
-DATA_FILE = os.path.join(gettempdir(), DATA_FILE_NAME)
+# DATA_FILE = os.path.join(gettempdir(), DATA_FILE_NAME) # cannot store here, files are cleaned up at every boot
+DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), DATA_FILE_NAME))

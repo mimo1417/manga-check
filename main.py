@@ -10,6 +10,9 @@ import webbrowser
 import click
 import os
 import csv
+import traceback
+
+DEBUG=True
 
 
 @click.group(invoke_without_command=True)
@@ -36,7 +39,7 @@ def check(ctx):
             if ctx.obj['web']:
                 webbrowser.open(manga['url'])
     else:
-        click.echo("There are no new chapter")
+        click.echo("There is no new chapter")
 
 
 @commands.command()
@@ -47,6 +50,7 @@ def clean():
         click.echo("File {} deleted".format(DATA_FILE))
     except OSError as e:
         click.echo("Cannot delete file {}".format(DATA_FILE))
+        if DEBUG: click.echo(traceback.format_exc())
 
 
 @commands.command()
@@ -78,6 +82,7 @@ def web(id):
         click.echo("ID not invalid: {}, need to be a number in config. see show command".format(id))
     except:
         click.echo("Something wrong")
+        if DEBUG: click.echo(traceback.format_exc())
 
 if __name__ == '__main__':
     commands(obj={})
