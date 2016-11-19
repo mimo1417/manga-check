@@ -67,4 +67,5 @@ class MangaCrawler(object):
 
     def write_to_file(self):
         writer = csv.writer(open(DATA_FILE, 'wb'))
-        writer.writerows(self.updated_data)
+        for id, data in self.data.items():
+            writer.writerow([id, data])
