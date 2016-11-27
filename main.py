@@ -37,7 +37,7 @@ def check(ctx):
             click.echo("[{}] New chapter: {}-{}".format(manga['id'],
                                                         manga['name'], manga['latest']))
             if ctx.obj['web']:
-                webbrowser.open(manga['url'])
+                webbrowser.open("{}/{}".format(manga['url'], manga['latest']))
     else:
         click.echo("There is no new chapter")
 
