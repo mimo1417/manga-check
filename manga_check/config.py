@@ -36,12 +36,14 @@ MANGAS = {
         'id': 0,
         'name': 'One Piece',
         'url': 'http://www.mangapanda.com/one-piece',
+        'reddit': 'https://www.reddit.com/r/OnePiece/',
         'function': _soup_mangapanda
     },
     1: {
         'id': 1,
         'name': 'Gintama',
         'url': 'http://www.mangapanda.com/gintama',
+        'reddit': 'https://www.reddit.com/r/Gintama/',
         'function': _soup_mangapanda
     },
     2: {

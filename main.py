@@ -84,5 +84,25 @@ def web(id):
         click.echo("Something wrong")
         if DEBUG: click.echo(traceback.format_exc())
 
+@commands.command()
+@click.argument('id')
+def reddit(id):
+    """Open reddit thread with ID provided"""
+    try:
+        id = int(id)
+        if not id in MANGAS:
+            raise ValueError
+        manga = MANGAS[id]
+        if 'reddit' not in manga: raise KeyError
+        click.echo("Opening {} at {}".format(manga['name'],manga['reddit']))
+        webbrowser.open("{}".format(manga['reddit']))
+    except ValueError as e:
+        click.echo("ID not invalid: {}, need to be a number in config. see show command".format(id))
+    except KeyError as e:
+        click.echo("Manga id={}, name={} don't have reddit page".format(id))
+    except:
+        click.echo("Something wrong")
+        if DEBUG: click.echo(traceback.format_exc())
+
 if __name__ == '__main__':
     commands(obj={})
