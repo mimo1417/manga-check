@@ -13,12 +13,13 @@ from bs4 import BeautifulSoup
 class MangaCrawler(object):
     """Manga crawler class"""
 
-    def __init__(self):
+    def __init__(self, logger=lambda _: None):
         try:
             file_data = csv.reader(open(DATA_FILE, 'rb'))
         except IOError as e:
             file_data = {}
         self.data = dict((int(row[0]), int(row[1])) for row in file_data)
+        self.logger = logger
         self.updated_data = []
 
     def check(self):
@@ -27,7 +28,10 @@ class MangaCrawler(object):
         Returns:
             list: list of manga that have been updated
         """
+        self.logger('... checking ...')
         for id, manga in MANGAS.iteritems():
+            self.logger('checking [{}] "{}" at {}'.format(
+                manga['id'], manga['name'], manga['url']))
             latest = self.crawl(id)
             if id in self.data:
                 cur_latest = self.data[id]
@@ -46,6 +50,7 @@ class MangaCrawler(object):
             _udata['latest'] = udata[1]
             _udata.pop('function', None)
             return_data.append(_udata)
+        self.logger('..done.')
         return return_data
 
     def crawl(self, manga_id):

@@ -30,7 +30,7 @@ def commands(ctx, web):
 @click.pass_context
 def check(ctx):
     """Check for latest manga chapter!"""
-    crawler = MangaCrawler()
+    crawler = MangaCrawler(logger=lambda msg:click.echo(msg))
     updated_chapter = crawler.check()
     if updated_chapter:
         for manga in updated_chapter:
