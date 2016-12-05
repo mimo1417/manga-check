@@ -75,10 +75,11 @@ or run command, and optional options. Check at help:
           --help            Show this message and exit.
 
         Commands:
-          check  Check for latest manga chapter!
-          clean  Remove local data file
-          show   Show local data
-          web    Open web with ID provided
+          check   Check for latest manga chapter!
+          clean   Remove local data file
+          reddit  Open reddit thread with ID provided
+          show    Show local data
+          web     Open web with ID provided
 
 When running without command, or with command `check` to start. The result are list of site has new chapter.
 

@@ -39,6 +39,7 @@ class MangaCrawler(object):
                 cur_latest = 0
                 self.data[id] = 0
             if latest > cur_latest:
+                self.logger(' > found!')
                 self.updated_data.append((id, latest))
                 self.data[id] = latest
 
