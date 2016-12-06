@@ -12,7 +12,7 @@ import os
 import csv
 import traceback
 
-DEBUG=True
+DEBUG = True
 
 
 @click.group(invoke_without_command=True)
@@ -30,7 +30,7 @@ def commands(ctx, web):
 @click.pass_context
 def check(ctx):
     """Check for latest manga chapter!"""
-    crawler = MangaCrawler(logger=lambda msg:click.echo(msg))
+    crawler = MangaCrawler(logger=lambda msg: click.echo(msg))
     updated_chapter = crawler.check()
     if updated_chapter:
         for manga in updated_chapter:
@@ -50,7 +50,8 @@ def clean():
         click.echo("File {} deleted".format(DATA_FILE))
     except OSError as e:
         click.echo("Cannot delete file {}".format(DATA_FILE))
-        if DEBUG: click.echo(traceback.format_exc())
+        if DEBUG:
+            click.echo(traceback.format_exc())
 
 
 @commands.command()
@@ -64,6 +65,7 @@ def show():
             click.echo("[{}] {}: {}".format(
                 MANGAS[id]['id'], MANGAS[id]['name'], row[1]))
 
+
 @commands.command()
 @click.argument('id')
 def web(id):
@@ -76,13 +78,16 @@ def web(id):
         with open(DATA_FILE) as csvfile:
             file_data = csv.reader(csvfile)
             latest_data = dict((int(row[0]), int(row[1])) for row in file_data)
-        click.echo("Opening {} at {}".format(manga['name'],manga['url']))
+        click.echo("Opening {} at {}".format(manga['name'], manga['url']))
         webbrowser.open("{}/{}".format(manga['url'], latest_data[id]))
     except ValueError as e:
-        click.echo("ID not invalid: {}, need to be a number in config. see show command".format(id))
+        click.echo(
+            "ID not invalid: {}, need to be a number in config. see show command".format(id))
     except:
         click.echo("Something wrong")
-        if DEBUG: click.echo(traceback.format_exc())
+        if DEBUG:
+            click.echo(traceback.format_exc())
+
 
 @commands.command()
 @click.argument('id')
@@ -93,16 +98,20 @@ def reddit(id):
         if not id in MANGAS:
             raise ValueError
         manga = MANGAS[id]
-        if 'reddit' not in manga: raise KeyError
-        click.echo("Opening {} at {}".format(manga['name'],manga['reddit']))
+        if 'reddit' not in manga:
+            raise KeyError
+        click.echo("Opening {} at {}".format(manga['name'], manga['reddit']))
         webbrowser.open("{}".format(manga['reddit']))
     except ValueError as e:
-        click.echo("ID not invalid: {}, need to be a number in config. see show command".format(id))
+        click.echo(
+            "ID not invalid: {}, need to be a number in config. see show command".format(id))
     except KeyError as e:
-        click.echo("Manga id={}, name={} don't have reddit page".format(id))
+        click.echo("Manga id={}, name={} don't have reddit page".format(
+            manga['id'], manga['name']))
     except:
         click.echo("Something wrong")
-        if DEBUG: click.echo(traceback.format_exc())
+        if DEBUG:
+            click.echo(traceback.format_exc())
 
 if __name__ == '__main__':
     commands(obj={})
