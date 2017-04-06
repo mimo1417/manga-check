@@ -18,9 +18,13 @@ class MangaCrawler(object):
             file_data = csv.reader(open(DATA_FILE, 'rb'))
         except IOError as e:
             file_data = {}
-        self.data = dict((int(row[0]), int(row[1])) for row in file_data)
+        # data from csv file
+        self.data = dict((int(row[0]), {
+            'id': int(row[0]),
+            'chapter': int(row[1]),
+            'is_read': int(row[2]),
+        }) for row in file_data)
         self.logger = logger
-        self.updated_data = []
 
     def check(self):
         """Run check on all mangas in config
@@ -29,39 +33,46 @@ class MangaCrawler(object):
             list: list of manga that have been updated
         """
         self.logger('... checking ...')
+
+        return_data = []
         for id, manga in MANGAS.iteritems():
             self.logger('checking [{}] "{}" at {}'.format(
                 manga['id'], manga['name'], manga['url']))
             latest = self.crawl(id)
+            # already been crawled
             if id in self.data:
-                cur_latest = self.data[id]
+                cur_latest = self.data[id]['chapter']
+            # if haven't crawled before
             else:
                 cur_latest = 0
-                self.data[id] = 0
+                self.data.setdefault(id, {})
+                self.data[id]['id'] = id
+                self.data[id]['chapter'] = 0
+                self.data[id]['is_read'] = 0
+
+            # if is read and greater than current
             if latest > cur_latest:
                 self.logger(' > found!')
-                self.updated_data.append((id, latest))
-                self.data[id] = latest
+                self.data[id]['chapter'] = latest
+                self.data[id]['is_read'] = 0
+
+            # if new chaoter or simply not read
+            if latest > cur_latest or self.data[id]['is_read'] == 0:
+                data = dict(MANGAS[id])
+                data['latest'] = latest
+                data.pop('function', None)
+                return_data.append(data)
 
         self.write_to_file()
-
-        return_data = []
-        for udata in self.updated_data:
-            _udata = dict(MANGAS[udata[0]])
-            _udata['latest'] = udata[1]
-            _udata.pop('function', None)
-            return_data.append(_udata)
         self.logger('..done.')
         return return_data
 
-    def crawl(self, manga_id):
-        """Run crawl on manga'id
-
-        Args:
-            url (string): url of the manga
-
-        Returns:
-            int: latest chapter
+    @staticmethod
+    def crawl(manga_id):
+        """
+        crawl based on manga'id in config
+        :param manga_id: 
+        :return: 
         """
 
         url = MANGAS[manga_id]['url']
@@ -74,4 +85,8 @@ class MangaCrawler(object):
     def write_to_file(self):
         writer = csv.writer(open(DATA_FILE, 'wb'))
         for id, data in self.data.items():
-            writer.writerow([id, data])
+            writer.writerow([data['id'], data['chapter'], data['is_read']])
+
+    def update_view_manga(self, manga_id):
+        self.data[manga_id]['is_read'] = 1
+        self.write_to_file()

@@ -1,2 +1,3 @@
 *.pyc
 manga_check/manga_check.csv
+.idea

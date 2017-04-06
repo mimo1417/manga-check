@@ -16,7 +16,8 @@ DEBUG = True
 
 
 @click.group(invoke_without_command=True)
-@click.option('--web/--no-web', default=False, help='Open web browser on updated chapter')
+@click.option('--web/--no-web', default=False,
+              help='Open web browser on updated chapter')
 @click.pass_context
 def commands(ctx, web):
     ctx.obj['web'] = web
@@ -35,7 +36,8 @@ def check(ctx):
     if updated_chapter:
         for manga in updated_chapter:
             click.echo("[{}] New chapter: {}-{}".format(manga['id'],
-                                                        manga['name'], manga['latest']))
+                                                        manga['name'],
+                                                        manga['latest']))
             if ctx.obj['web']:
                 webbrowser.open("{}/{}".format(manga['url'], manga['latest']))
     else:
@@ -48,7 +50,7 @@ def clean():
     try:
         os.remove(DATA_FILE)
         click.echo("File {} deleted".format(DATA_FILE))
-    except OSError as e:
+    except OSError:
         click.echo("Cannot delete file {}".format(DATA_FILE))
         if DEBUG:
             click.echo(traceback.format_exc())
@@ -62,8 +64,9 @@ def show():
         click.echo("Showing file {}:".format(DATA_FILE))
         for row in reader:
             id = int(row[0])
-            click.echo("[{}] {}: {}".format(
-                MANGAS[id]['id'], MANGAS[id]['name'], row[1]))
+            is_read_str = '[x]' if int(row[2]) == 0 else '[o]'
+            click.echo("[{}] {} {}: {}".format(
+                MANGAS[id]['id'], is_read_str, MANGAS[id]['name'], row[1]))
 
 
 @commands.command()
@@ -72,7 +75,7 @@ def web(id):
     """Open web with ID provided"""
     try:
         id = int(id)
-        if not id in MANGAS:
+        if id not in MANGAS:
             raise ValueError
         manga = MANGAS[id]
         with open(DATA_FILE) as csvfile:
@@ -80,9 +83,12 @@ def web(id):
             latest_data = dict((int(row[0]), int(row[1])) for row in file_data)
         click.echo("Opening {} at {}".format(manga['name'], manga['url']))
         webbrowser.open("{}/{}".format(manga['url'], latest_data[id]))
-    except ValueError as e:
+        crawler = MangaCrawler(logger=lambda msg: click.echo(msg))
+        crawler.update_view_manga(id)
+    except ValueError:
         click.echo(
-            "ID not invalid: {}, need to be a number in config. see show command".format(id))
+            "ID not invalid: {}, need to be a number in config. \
+            see show command".format(id))
     except:
         click.echo("Something wrong")
         if DEBUG:
@@ -95,23 +101,25 @@ def reddit(id):
     """Open reddit thread with ID provided"""
     try:
         id = int(id)
-        if not id in MANGAS:
+        if id not in MANGAS:
             raise ValueError
         manga = MANGAS[id]
         if 'reddit' not in manga:
             raise KeyError
         click.echo("Opening {} at {}".format(manga['name'], manga['reddit']))
         webbrowser.open("{}".format(manga['reddit']))
-    except ValueError as e:
+    except ValueError:
         click.echo(
-            "ID not invalid: {}, need to be a number in config. see show command".format(id))
-    except KeyError as e:
+            "ID not invalid: {}, need to be a number in config. \
+            see show command".format(id))
+    except KeyError:
         click.echo("Manga id={}, name={} don't have reddit page".format(
             manga['id'], manga['name']))
     except:
         click.echo("Something wrong")
         if DEBUG:
             click.echo(traceback.format_exc())
+
 
 if __name__ == '__main__':
     commands(obj={})
