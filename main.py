@@ -64,7 +64,7 @@ def show():
         click.echo("Showing file {}:".format(DATA_FILE))
         for row in reader:
             id = int(row[0])
-            is_read_str = '[x]' if int(row[2]) == 0 else '[o]'
+            is_read_str = '[_]' if int(row[2]) == 0 else '[x]'
             click.echo("[{}] {} {}: {}".format(
                 MANGAS[id]['id'], is_read_str, MANGAS[id]['name'], row[1]))
 
