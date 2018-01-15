@@ -47,13 +47,12 @@ def _soup_mangastream(soup):
 
 # list of manga
 MANGAS = {
-    # 0: {
-    #     'id': 0,
-    #     'name': 'One Piece',
-    #     'url': 'http://www.mangapanda.com/one-piece',
-    #     'reddit': 'https://www.reddit.com/r/OnePiece/',
-    #     'function': _soup_mangapanda
-    # },
+    0: {
+        'id': 0,
+        'name': 'One Piece MS',
+        'url': 'http://mangastream.com/manga/one_piece',
+        'function': _soup_mangastream
+    },
     1: {
         'id': 1,
         'name': 'Gintama',
@@ -61,12 +60,12 @@ MANGAS = {
         'reddit': 'https://www.reddit.com/r/Gintama/',
         'function': _soup_mangapanda
     },
-    # 2: {
-    #     'id': 2,
-    #     'name': 'Fairy Tail',
-    #     'url': 'http://www.mangapanda.com/fairy-tail',
-    #     'function': _soup_mangapanda
-    # },
+    3: {
+        'id': 3,
+        'name': 'Dragonball Super',
+        'url': 'http://mangastream.com/manga/dragon_ball_super',
+        'function': _soup_mangastream
+    },
     3: {
         'id': 3,
         'name': 'The Ruler Of The Land (Vietnamese)',
@@ -76,15 +75,21 @@ MANGAS = {
     4: {
         'id': 4,
         'name': 'One Punch man',
-        'url': 'http://www.mangapanda.com/onepunch-man',
-        'function': _soup_mangapanda
+        'url': 'http://readms.net/manga/onepunch_man',
+        'function': _soup_mangastream
     },
     5: {
         'id': 5,
-        'name': 'One Piece MS',
-        'url': 'http://mangastream.com/manga/one_piece',
+        'name': 'Boruto',
+        'url': 'http://mangastream.com/manga/boruto',
         'function': _soup_mangastream
-    }
+    },
+    6: {
+        'id': 6,
+        'name': 'Dragonball Super',
+        'url': 'http://mangastream.com/manga/dragon_ball_super',
+        'function': _soup_mangastream
+    },
 }
 
 # data storage
