@@ -1,9 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# @Author: vietvu
-# @Date:   2016-10-11 17:55:03
-# @Last Modified by:   Viet Vu
-# @Last Modified time: 2016-10-12 11:04:31
+
 from manga_check.crawler import MangaCrawler
 from manga_check.config import DATA_FILE, MANGAS
 import webbrowser

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # Manga crawler class
-# @Author: vietvu
-# @Date:   2016-10-11 18:02:02
-# @Last Modified by:   Viet Vu
-# @Last Modified time: 2016-10-12 10:42:14
-from config import DATA_FILE, MANGAS
+
+from manga_check.config import DATA_FILE, MANGAS
 import csv
-import requests
 from bs4 import BeautifulSoup
+import asyncio
+import aiohttp
+import traceback
 
 
 class MangaCrawler(object):
@@ -15,7 +14,7 @@ class MangaCrawler(object):
 
     def __init__(self, logger=lambda _: None):
         try:
-            file_data = csv.reader(open(DATA_FILE, 'rb'))
+            file_data = csv.reader(open(DATA_FILE, 'r'))
         except IOError as e:
             file_data = {}
         # data from csv file
@@ -27,6 +26,11 @@ class MangaCrawler(object):
         self.logger = logger
 
     def check(self):
+        ioloop = asyncio.get_event_loop()
+        ioloop.run_until_complete(self.async_check())
+        ioloop.close()
+
+    async def async_check(self):
         """Run check on all mangas in config
 
         Returns:
@@ -34,56 +38,68 @@ class MangaCrawler(object):
         """
         self.logger('... checking ...')
 
+        futures = [self.crawl(manga_id) for manga_id in MANGAS]
+        done_tasks, _ = await asyncio.wait(futures)
+
         return_data = []
-        for id, manga in MANGAS.iteritems():
-            self.logger('checking [{}] "{}" at {}'.format(
-                manga['id'], manga['name'], manga['url']))
-            latest = self.crawl(id)
+        for task in done_tasks:
+            manga_id, latest = None, None
+            try:
+                manga_id, latest = task.result()
+            except:
+                self.logger("Something is wrong: {}".format(
+                    traceback.format_exc()))
+            manga = MANGAS[manga_id]
+
             # already been crawled
-            if id in self.data:
-                cur_latest = self.data[id]['chapter']
+            if manga_id in self.data:
+                cur_latest = self.data[manga_id]['chapter']
+
             # if haven't crawled before
             else:
                 cur_latest = 0
-                self.data.setdefault(id, {})
-                self.data[id]['id'] = id
-                self.data[id]['chapter'] = 0
-                self.data[id]['is_read'] = 0
+                self.data.setdefault(manga_id, {})
+                self.data[manga_id]['id'] = manga_id
+                self.data[manga_id]['chapter'] = 0
+                self.data[manga_id]['is_read'] = 0
 
             # if is read and greater than current
             if latest > cur_latest:
                 self.logger(' > found!')
-                self.data[id]['chapter'] = latest
-                self.data[id]['is_read'] = 0
+                self.data[manga_id]['chapter'] = latest
+                self.data[manga_id]['is_read'] = 0
 
+            self.logger('checking [{id}] "{name}" at {url}:: {latest} ~ {cur_latest}'
+                        .format(id=manga['id'], name=manga['name'], url=manga['url'], latest=latest, cur_latest=cur_latest))
             # if new chaoter or simply not read
-            if latest > cur_latest or self.data[id]['is_read'] == 0:
-                data = dict(MANGAS[id])
+            if latest > cur_latest or self.data[manga_id]['is_read'] == 0:
+                data = dict(MANGAS[manga_id])
                 data['latest'] = latest
                 data.pop('function', None)
                 return_data.append(data)
 
         self.write_to_file()
-        self.logger('..done.')
+        self.logger('..done..')
         return return_data
 
-    @staticmethod
-    def crawl(manga_id):
+    async def crawl(self, manga_id):
         """
         crawl based on manga'id in config
         :param manga_id: 
         :return: 
         """
-
         url = MANGAS[manga_id]['url']
-        text = requests.get(url).text
-        soup = BeautifulSoup(text, 'html.parser')
-        latest_chapter = MANGAS[manga_id]['function'](soup)
 
-        return latest_chapter
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                text = await response.text()
+                soup = BeautifulSoup(text, 'html.parser')
+                latest_chapter = MANGAS[manga_id]['function'](soup)
+
+                return manga_id, latest_chapter
 
     def write_to_file(self):
-        writer = csv.writer(open(DATA_FILE, 'wb'))
+        writer = csv.writer(open(DATA_FILE, 'w'))
         for id, data in self.data.items():
             writer.writerow([data['id'], data['chapter'], data['is_read']])
 
