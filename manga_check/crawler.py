@@ -42,6 +42,10 @@ class MangaCrawler(object):
         done_tasks, _ = await asyncio.wait(futures)
 
         return_data = []
+        len_names_url = [(len(manga['name']), len(manga['url']))
+                         for _, manga in MANGAS.items()]
+        len_names, len_urls = list(zip(*len_names_url))
+        max_name_len, max_url_len = max(len_names), max(len_urls)
         for task in done_tasks:
             manga_id, latest = None, None
             try:
@@ -69,8 +73,11 @@ class MangaCrawler(object):
                 self.data[manga_id]['chapter'] = latest
                 self.data[manga_id]['is_read'] = 0
 
-            self.logger('checking [{id}] "{name}" at {url}:: {latest} ~ {cur_latest}'
-                        .format(id=manga['id'], name=manga['name'], url=manga['url'], latest=latest, cur_latest=cur_latest))
+            self.logger(
+                'checking [{id}] {name} at {url} :: {latest} ~ {cur_latest}'
+                .format(id=manga['id'], latest=latest, cur_latest=cur_latest,
+                        name=manga['name'].ljust(max_name_len),
+                        url=manga['url'].ljust(max_url_len)))
             # if new chaoter or simply not read
             if latest > cur_latest or self.data[manga_id]['is_read'] == 0:
                 data = dict(MANGAS[manga_id])
@@ -79,14 +86,13 @@ class MangaCrawler(object):
                 return_data.append(data)
 
         self.write_to_file()
-        self.logger('..done..')
         return return_data
 
     async def crawl(self, manga_id):
         """
         crawl based on manga'id in config
-        :param manga_id: 
-        :return: 
+        :param manga_id:
+        :return:
         """
         url = MANGAS[manga_id]['url']
 
