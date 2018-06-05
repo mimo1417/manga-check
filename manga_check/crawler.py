@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Manga crawler class
-
+import operator
 from manga_check.config import DATA_FILE, MANGAS
 import csv
 from bs4 import BeautifulSoup
@@ -46,13 +46,21 @@ class MangaCrawler(object):
                          for _, manga in MANGAS.items()]
         len_names, len_urls = list(zip(*len_names_url))
         max_name_len, max_url_len = max(len_names), max(len_urls)
+        
+        results = []
         for task in done_tasks:
             manga_id, latest = None, None
             try:
                 manga_id, latest = task.result()
-            except:
+                results.append((manga_id, latest))
+            except Exception as e:
+                self.logger(e)
                 self.logger("Something is wrong: {}".format(
                     traceback.format_exc()))
+        
+        results.sort(key=operator.itemgetter(0))
+        
+        for manga_id, latest in results:
             manga = MANGAS[manga_id]
 
             # already been crawled
@@ -67,18 +75,19 @@ class MangaCrawler(object):
                 self.data[manga_id]['chapter'] = 0
                 self.data[manga_id]['is_read'] = 0
 
+            self.logger(
+                'checking [{id}] {name} at {url} :: {latest} ~ {cur_latest}'
+                .format(id=manga['id'], latest=latest, cur_latest=cur_latest,
+                        name=manga['name'].ljust(max_name_len),
+                        url=manga['url'].ljust(max_url_len)))
+
             # if is read and greater than current
             if latest > cur_latest:
                 self.logger(' > found!')
                 self.data[manga_id]['chapter'] = latest
                 self.data[manga_id]['is_read'] = 0
 
-            self.logger(
-                'checking [{id}] {name} at {url} :: {latest} ~ {cur_latest}'
-                .format(id=manga['id'], latest=latest, cur_latest=cur_latest,
-                        name=manga['name'].ljust(max_name_len),
-                        url=manga['url'].ljust(max_url_len)))
-            # if new chaoter or simply not read
+            # if new chapter or simply not read
             if latest > cur_latest or self.data[manga_id]['is_read'] == 0:
                 data = dict(MANGAS[manga_id])
                 data['latest'] = latest
@@ -106,7 +115,7 @@ class MangaCrawler(object):
 
     def write_to_file(self):
         writer = csv.writer(open(DATA_FILE, 'w'))
-        for id, data in self.data.items():
+        for _, data in self.data.items():
             writer.writerow([data['id'], data['chapter'], data['is_read']])
 
     def update_view_manga(self, manga_id):

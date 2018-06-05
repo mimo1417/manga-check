@@ -41,8 +41,16 @@ def _soup_mangastream(soup):
     Returns:
         int: latest chapter
     """
-    a = soup.select('table.table-striped td')
     return int([s.strip() for s in soup.select('table.table-striped td')[0].text.split('-') if s.strip().isdigit()][0])
+
+def _soup_manga_rock(soup):
+    """Crawler for MangaRock
+    
+    Args:
+        soup (BeautifulSoup):
+    """
+    s = soup.select('tbody[data-test=chapter-table] td')
+    return int(s[0].find('a').text.split(':')[0].split('Chapter ')[1])
 
 
 # list of manga
@@ -59,12 +67,6 @@ MANGAS = {
         'url': 'http://www.mangapanda.com/gintama',
         'reddit': 'https://www.reddit.com/r/Gintama/',
         'function': _soup_mangapanda
-    },
-    3: {
-        'id': 3,
-        'name': 'Dragonball Super',
-        'url': 'http://mangastream.com/manga/dragon_ball_super',
-        'function': _soup_mangastream
     },
     3: {
         'id': 3,
@@ -87,9 +89,10 @@ MANGAS = {
     6: {
         'id': 6,
         'name': 'Dragonball Super',
-        'url': 'http://mangastream.com/manga/dragon_ball_super',
-        'function': _soup_mangastream
+        'url': 'https://mangarock.com/manga/mrs-serie-64116',
+        'function': _soup_manga_rock
     },
+    
 }
 
 # data storage

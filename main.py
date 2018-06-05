@@ -86,8 +86,8 @@ def web(id):
         click.echo(
             "ID not invalid: {}, need to be a number in config. \
             see show command".format(id))
-    except:
-        click.echo("Something wrong")
+    except Exception as e:
+        click.echo("Something wrong: {}".format(e.messsage))
         if DEBUG:
             click.echo(traceback.format_exc())
 
@@ -112,8 +112,8 @@ def reddit(id):
     except KeyError:
         click.echo("Manga id={}, name={} don't have reddit page".format(
             manga['id'], manga['name']))
-    except:
-        click.echo("Something wrong")
+    except Exception as e:
+        click.echo("Something wrong: {}".format(e.messsage))
         if DEBUG:
             click.echo(traceback.format_exc())
 
