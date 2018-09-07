@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from manga_check.crawler import MangaCrawler
-from manga_check.config import DATA_FILE, MANGAS
+from manga_check.config import  MANGAS
+from manga_check.storage import Storage
+
 import webbrowser
 import click
 import os
@@ -44,26 +46,22 @@ def check(ctx):
 @commands.command()
 def clean():
     """Remove local data file"""
-    try:
-        os.remove(DATA_FILE)
-        click.echo("File {} deleted".format(DATA_FILE))
-    except OSError:
-        click.echo("Cannot delete file {}".format(DATA_FILE))
-        if DEBUG:
-            click.echo(traceback.format_exc())
+    storage = Storage()
+    storage.clean()
 
 
 @commands.command()
 def show():
     """Show local data"""
-    with open(DATA_FILE) as csvfile:
-        reader = csv.reader(csvfile)
-        click.echo("Showing file {}:".format(DATA_FILE))
-        for row in reader:
-            id = int(row[0])
-            is_read_str = '[_]' if int(row[2]) == 0 else '[x]'
-            click.echo("[{}] {} {}: {}".format(
-                MANGAS[id]['id'], is_read_str, MANGAS[id]['name'], row[1]))
+    storage = Storage()
+
+    data = storage.get()
+    print(data)
+    for row in data:
+        id = int(row['id'])
+        is_read_str = '[_]' if int(row['is_read']) == 0 else '[x]'
+        click.echo("[{}] {} {}: {}".format(
+            MANGAS[id]['id'], is_read_str, MANGAS[id]['name'], row['chapter']))
 
 
 @commands.command()
@@ -71,13 +69,12 @@ def show():
 def web(id):
     """Open web with ID provided"""
     try:
+        storage = Storage()
         id = int(id)
         if id not in MANGAS:
             raise ValueError
         manga = MANGAS[id]
-        with open(DATA_FILE) as csvfile:
-            file_data = csv.reader(csvfile)
-            latest_data = dict((int(row[0]), int(row[1])) for row in file_data)
+        latest_data = dict((int(row['id']), int(row['chapter'])) for row in storage.get())
         click.echo("Opening {} at {}".format(manga['name'], manga['url']))
         webbrowser.open("{}/{}".format(manga['url'], latest_data[id]))
         crawler = MangaCrawler(logger=lambda msg: click.echo(msg))

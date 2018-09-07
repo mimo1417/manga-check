@@ -2,3 +2,4 @@ beautifulsoup4
 click
 asyncio
 aiohttp
+pymongo

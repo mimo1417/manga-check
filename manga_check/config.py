@@ -96,6 +96,5 @@ MANGAS = {
 }
 
 # data storage
-DATA_FILE_NAME = 'manga_check.csv'
-# DATA_FILE = os.path.join(gettempdir(), DATA_FILE_NAME) # cannot store here, files are cleaned up at every boot
-DATA_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), DATA_FILE_NAME))
+MANGA_MONGO_DB = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
+MONGO_COLLECTION = 'manga_collection'

@@ -2,3 +2,5 @@
 manga_check/manga_check.csv
 .idea
 .vscode
+
+.pytest_cache

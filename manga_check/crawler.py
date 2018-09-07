@@ -1,28 +1,32 @@
 # -*- coding: utf-8 -*-
 # Manga crawler class
 import operator
-from manga_check.config import DATA_FILE, MANGAS
 import csv
-from bs4 import BeautifulSoup
-import asyncio
-import aiohttp
 import traceback
 
+import pymongo
+import asyncio
+import aiohttp
+from bs4 import BeautifulSoup
+
+from manga_check.config import MANGAS
+from manga_check.storage import Storage
 
 class MangaCrawler(object):
     """Manga crawler class"""
 
     def __init__(self, logger=lambda _: None):
+        self.storage = Storage()
         try:
-            file_data = csv.reader(open(DATA_FILE, 'r'))
-        except IOError as e:
-            file_data = {}
-        # data from csv file
-        self.data = dict((int(row[0]), {
-            'id': int(row[0]),
-            'chapter': int(row[1]),
-            'is_read': int(row[2]),
-        }) for row in file_data)
+            storage_data = self.get_data()
+        except Exception:
+            storage_data = []
+
+        self.data = dict((int(row['id']), {
+            'id': int(row['id']),
+            'chapter': int(row['chapter']),
+            'is_read': int(row['is_read']),
+        }) for row in storage_data)
         self.logger = logger
 
     def check(self):
@@ -94,7 +98,7 @@ class MangaCrawler(object):
                 data.pop('function', None)
                 return_data.append(data)
 
-        self.write_to_file()
+        self.store_data()
         return return_data
 
     async def crawl(self, manga_id):
@@ -113,11 +117,17 @@ class MangaCrawler(object):
 
                 return manga_id, latest_chapter
 
-    def write_to_file(self):
-        writer = csv.writer(open(DATA_FILE, 'w'))
-        for _, data in self.data.items():
-            writer.writerow([data['id'], data['chapter'], data['is_read']])
+    def get_data(self):
+        """get data  from storage
+        """
+        return self.storage.get()
+
+
+    def store_data(self):
+        """store data to storage
+        """
+        self.storage.update(self.data)
 
     def update_view_manga(self, manga_id):
         self.data[manga_id]['is_read'] = 1
-        self.write_to_file()
+        self.store_data()
