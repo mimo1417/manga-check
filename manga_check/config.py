@@ -98,3 +98,5 @@ MANGAS = {
 # data storage
 MANGA_MONGO_DB = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
 MONGO_COLLECTION = 'manga_collection'
+TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN'] if 'TELEGRAM_TOKEN' in os.environ else ''
+TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID'] if 'TELEGRAM_CHAT_ID' in os.environ else ''

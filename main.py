@@ -4,6 +4,7 @@
 from manga_check.crawler import MangaCrawler
 from manga_check.config import  MANGAS
 from manga_check.storage import Storage
+from manga_check.notify import notify
 
 import webbrowser
 import click
@@ -33,12 +34,18 @@ def check(ctx):
     crawler = MangaCrawler(logger=lambda msg: click.echo(msg))
     updated_chapter = crawler.check()
     if updated_chapter:
+        msg = ["MANGA: new chapter!"]
         for manga in updated_chapter:
-            click.echo("[{}] New chapter: {}-{}".format(manga['id'],
+            m = "[{}] New chapter: {}-{}".format(manga['id'],
                                                         manga['name'],
-                                                        manga['latest']))
+                                                        manga['latest'])
+            click.echo(m)
+            msg.append(m)
             if ctx.obj['web']:
                 webbrowser.open("{}/{}".format(manga['url'], manga['latest']))
+        msg = "\n".join(msg)
+        notify(msg)
+
     else:
         click.echo("There is no new chapter")
 

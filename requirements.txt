@@ -3,3 +3,4 @@ click
 asyncio
 aiohttp
 pymongo
+python-telegram-bot

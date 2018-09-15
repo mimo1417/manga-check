@@ -33,8 +33,9 @@ class MangaCrawler(object):
 
     def check(self):
         ioloop = asyncio.get_event_loop()
-        ioloop.run_until_complete(self.async_check())
+        res = ioloop.run_until_complete(self.async_check())
         ioloop.close()
+        return res
 
     async def async_check(self):
         """Run check on all mangas in config
@@ -89,12 +90,13 @@ class MangaCrawler(object):
 
             # if is read and greater than current
             if latest > cur_latest:
-                self.logger(' > found!')
+                self.logger(f' > found! {latest} > {cur_latest}')
                 self.data[manga_id]['chapter'] = latest
                 self.data[manga_id]['is_read'] = 0
 
             # if new chapter or simply not read
-            if latest > cur_latest or self.data[manga_id]['is_read'] == 0:
+            # who do we update the data on server? nah, ignore it, just return latest
+            if latest > cur_latest: #or self.data[manga_id]['is_read'] == 0:
                 data = dict(MANGAS[manga_id])
                 data['latest'] = latest
                 data.pop('function', None)
