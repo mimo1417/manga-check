@@ -115,7 +115,11 @@ class MangaCrawler(object):
             async with session.get(url) as response:
                 text = await response.text()
                 soup = BeautifulSoup(text, 'html.parser')
-                latest_chapter = MANGAS[manga_id]['function'](soup)
+                try:
+                    latest_chapter = MANGAS[manga_id]['function'](soup)
+                except Exception as e:
+                    self.logger.exceptio(f"manga_id={manga_id}")
+                    latest_chapter = -1
 
                 return manga_id, latest_chapter
 
