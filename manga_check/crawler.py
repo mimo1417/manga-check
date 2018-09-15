@@ -118,7 +118,9 @@ class MangaCrawler(object):
                 try:
                     latest_chapter = MANGAS[manga_id]['function'](soup)
                 except Exception as e:
-                    self.logger.exception(f"manga_id={manga_id}")
+                    import traceback
+                    self.logger(f"manga_id={manga_id}")
+                    self.logger(traceback.format_exc())
                     latest_chapter = -1
 
                 return manga_id, latest_chapter
