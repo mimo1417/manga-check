@@ -10,13 +10,15 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from manga_check.config import MANGAS
-from manga_check.storage import Storage
+from manga_check.storage import Storage, LocalStorage
+
 
 class MangaCrawler(object):
     """Manga crawler class"""
 
     def __init__(self, logger=lambda _: None):
         self.storage = Storage()
+
         try:
             storage_data = self.get_data()
         except Exception:
@@ -50,7 +52,7 @@ class MangaCrawler(object):
                          for _, manga in MANGAS.items()]
         len_names, len_urls = list(zip(*len_names_url))
         max_name_len, max_url_len = max(len_names), max(len_urls)
-        
+
         results = []
         for task in done_tasks:
             manga_id, latest = None, None
@@ -61,9 +63,9 @@ class MangaCrawler(object):
                 self.logger(e)
                 self.logger("Something is wrong: {}".format(
                     traceback.format_exc()))
-        
+
         results.sort(key=operator.itemgetter(0))
-        
+
         for manga_id, latest in results:
             manga = MANGAS[manga_id]
 
@@ -121,7 +123,6 @@ class MangaCrawler(object):
         """get data  from storage
         """
         return self.storage.get()
-
 
     def store_data(self):
         """store data to storage

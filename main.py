@@ -56,7 +56,6 @@ def show():
     storage = Storage()
 
     data = storage.get()
-    print(data)
     for row in data:
         id = int(row['id'])
         is_read_str = '[_]' if int(row['is_read']) == 0 else '[x]'
