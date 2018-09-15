@@ -39,7 +39,7 @@ class Storage(object):
 class MongoStorage(object):
 
     def __init__(self):
-        self.client = pymongo.MongoClient(MANGA_MONGO_DB, serverSelectionTimeoutMS=0)
+        self.client = pymongo.MongoClient(MANGA_MONGO_DB)
         self.collection = self.client.get_database().get_collection(MONGO_COLLECTION)
 
     def get(self):
