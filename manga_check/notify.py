@@ -12,8 +12,8 @@ def notify(message):
     Args:
         message (str): Description
     """
-    bot = telegram.Bot(token=config.TELEGRAM_TOKEN)
     try:
+        bot = telegram.Bot(token=config.TELEGRAM_TOKEN)
         bot.send_message(chat_id=int(config.TELEGRAM_CHAT_ID), text=message)
     except Exception as e:
         import traceback
